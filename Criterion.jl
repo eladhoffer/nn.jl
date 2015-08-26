@@ -1,22 +1,25 @@
 abstract Criterion{T} <: Layer{T}
 
 type ClassNLLCriterion{T} <: Layer{T}
-  output::Array{T}
+  output
   gradInput::Array{T}
+  ClassNLLCriterion() = new()
 end
 
-function updateOutput(m::ClassNLLCriterion, input, target)
-  m.output = Array{typeof(x[1]),size(x,1)}
+function forward(m::ClassNLLCriterion, input, target)
+  m.output = 0.0
   for i=1:size(input,1)
-    m.output[i] = -input[i][target[i]]
+    m.output += -input[i,target[i]]
   end
+  m.output /= size(input,1)
   return m.output
 end
-function updateGradInput(m::ClassNLLCriterion, input, gradOutput)
-  m.gradInput = zeros(gradOutput)
-  for i=1:size(gradOutput,1)
-    m.gradInput[i][target] = -1
+function backward(m::ClassNLLCriterion, input, target)
+  m.gradInput = zeros(input)
+  for i=1:size(input, 1)
+    m.gradInput[i, target[i]] = -1
   end
-  m.gradInput .*= gradOutput
-  return gradInput
+  return m.gradInput
 end
+
+ClassNLLCriterion() = ClassNLLCriterion{Float32}()

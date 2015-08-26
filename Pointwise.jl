@@ -10,7 +10,7 @@ type ReLU{T} <: Pointwise{T}
   (
   m = new(inplace);
   m.pForward = x -> x > 0 ? x : 0;
-  m.pBackward = x-> x > 0 ? 1 : 0;
+  m.pBackward = x -> x > 0 ? 1 : 0;
   m
   )
 end

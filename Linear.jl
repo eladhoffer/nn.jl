@@ -12,6 +12,8 @@ type Linear{T} <: Layer{T}
   x = new(nInputDims,nOutputDims);
   x.weight = rand(T, nInputDims,nOutputDims);
   x.bias = rand(T, nOutputDims);
+  x.gradWeight = zero(x.weight);
+  x.gradBias = zero(x.bias);
   reset!(x);
   x
   )
@@ -29,9 +31,11 @@ function updateGradInput(m::Linear, input, gradOutput)
 end
 
 function accGradParameters(m::Linear, input, gradOutput)
-  broadcast!(+, m.gradWeight, m.gradWeight, input);
-  broadcast!(+, m.gradBias, m.gradBias, input)
+  BLAS.gemm!('N','N', 1, gradOutput, weight, m.gradInput)
+  m.gradBias += sum(gradOutput, 2)
 end
+
+accGradParameters
 
 function reset!(m::Linear)
   stdv = 1/sqrt(size(m.weight,2))
@@ -46,4 +50,11 @@ function reset!(m::Linear, stdv)
   m.bias = m.bias*stdv - stdv
 end
 
+function updateParameters(m::Linear, updateFunc)
+  updateFunc(m.weight, m.bias, m.gradWeight, m.gradBias)
+end
+function zeroGradParameters(m::Linear)
+  fill!(m.gradWeight, 0)
+  fill!(m.gradBias, 0)
+end
 Linear(nInputDims,nOutputDims) = Linear{Float32}(nInputDims,nOutputDims)

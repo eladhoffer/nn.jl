@@ -11,3 +11,9 @@ function backward(m::Layer, input, gradOutput)
   end
   return m.gradInput
 end
+
+function updateParameters(m::Layer, updateFunc)
+end
+
+function zeroGradParameters(m::Layer)
+end

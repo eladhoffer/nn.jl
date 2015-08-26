@@ -12,7 +12,9 @@ export forward,
        backward,
        reset!,
        updateOutput,
-       updateGradInput
+       updateParameters,
+       updateGradInput,
+       zeroGradParameters
 
 
 include("Layer.jl")
